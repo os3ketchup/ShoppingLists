@@ -1,3 +1,4 @@
 <resources>
     <string name="app_name">Shopping Lists</string>
+    <string name="bar"> for </string>
 </resources>
