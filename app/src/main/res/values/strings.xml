@@ -1,4 +1,9 @@
 <resources>
     <string name="app_name">Shopping Lists</string>
     <string name="bar"> for </string>
+    <string name="name">name</string>
+    <string name="count">count</string>
+    <string name="save">save</string>
+    <string name="error_input_name">error input name</string>
+    <string name="error_input_count">error input count</string>
 </resources>

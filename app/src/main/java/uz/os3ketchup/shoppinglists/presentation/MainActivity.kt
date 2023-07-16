@@ -1,19 +1,15 @@
 package uz.os3ketchup.shoppinglists.presentation
 
-import android.content.ContentValues.TAG
-import android.net.wifi.WifiConfiguration.Status.ENABLED
-import androidx.appcompat.app.AppCompatActivity
 import android.os.Bundle
 import android.util.Log
-import android.view.LayoutInflater
-import android.widget.LinearLayout
-import android.widget.TextView
+import androidx.appcompat.app.AppCompatActivity
 import androidx.lifecycle.ViewModelProvider
 import androidx.recyclerview.widget.ItemTouchHelper
 import androidx.recyclerview.widget.RecyclerView
-import org.w3c.dom.Text
+import com.google.android.material.floatingactionbutton.FloatingActionButton
 import uz.os3ketchup.shoppinglists.R
-import uz.os3ketchup.shoppinglists.domain.ShopItem
+import uz.os3ketchup.shoppinglists.presentation.ShopItemActivity.Companion.newIntentAddItem
+import uz.os3ketchup.shoppinglists.presentation.ShopItemActivity.Companion.newIntentEditItem
 import uz.os3ketchup.shoppinglists.presentation.ShopListAdapter.Companion.MAX_POOL
 import uz.os3ketchup.shoppinglists.presentation.ShopListAdapter.Companion.SHOP_ITEM_DISABLED
 import uz.os3ketchup.shoppinglists.presentation.ShopListAdapter.Companion.SHOP_ITEM_ENABLED
@@ -22,6 +18,7 @@ class MainActivity : AppCompatActivity() {
 
     private lateinit var mainViewModel: MainViewModel
     private lateinit var shopListAdapter: ShopListAdapter
+    private lateinit var addButton: FloatingActionButton
 
 
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -32,7 +29,11 @@ class MainActivity : AppCompatActivity() {
         mainViewModel.shopList.observe(this) {
             Log.d(SOMETHING, "onCreate:s $it")
             shopListAdapter.submitList(it)
-            
+        }
+        addButton = findViewById(R.id.fab_main)
+        addButton.setOnClickListener {
+            val intent = newIntentAddItem(this)
+            startActivity(intent)
         }
 
     }
@@ -40,7 +41,7 @@ class MainActivity : AppCompatActivity() {
     private fun setupRecyclerView() {
         val shopListRV = findViewById<RecyclerView>(R.id.recyclerView_main)
         shopListAdapter = ShopListAdapter()
-        with(shopListRV){
+        with(shopListRV) {
             adapter = shopListAdapter
             recycledViewPool.setMaxRecycledViews(SHOP_ITEM_ENABLED, MAX_POOL)
             recycledViewPool.setMaxRecycledViews(SHOP_ITEM_DISABLED, MAX_POOL)
@@ -70,16 +71,20 @@ class MainActivity : AppCompatActivity() {
         val itemTouchHelper = ItemTouchHelper(itemTouchHelperCallBack)
         itemTouchHelper.attachToRecyclerView(shopListRV)
     }
+
     private fun setupClickListener() {
         shopListAdapter.onShopItemClickListener = {
-            Log.d(SOMETHING, "setupRecyclerView: $it")
+            val intent = newIntentEditItem(this, it.id)
+            startActivity(intent)
         }
     }
+
     private fun setUpLongClickListener() {
         shopListAdapter.onShopItemLongClickListener = {
             mainViewModel.editShopItem(it)
         }
     }
+
     companion object {
         const val SOMETHING = "LOG ViewModel"
 
