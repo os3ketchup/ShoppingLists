@@ -1,8 +1,11 @@
 package uz.os3ketchup.shoppinglists.presentation
 
+import android.annotation.SuppressLint
 import android.os.Bundle
 import android.util.Log
 import androidx.appcompat.app.AppCompatActivity
+import androidx.fragment.app.Fragment
+import androidx.fragment.app.FragmentContainerView
 import androidx.lifecycle.ViewModelProvider
 import androidx.recyclerview.widget.ItemTouchHelper
 import androidx.recyclerview.widget.RecyclerView
@@ -13,17 +16,22 @@ import uz.os3ketchup.shoppinglists.presentation.ShopItemActivity.Companion.newIn
 import uz.os3ketchup.shoppinglists.presentation.ShopListAdapter.Companion.MAX_POOL
 import uz.os3ketchup.shoppinglists.presentation.ShopListAdapter.Companion.SHOP_ITEM_DISABLED
 import uz.os3ketchup.shoppinglists.presentation.ShopListAdapter.Companion.SHOP_ITEM_ENABLED
+import java.lang.RuntimeException
 
-class MainActivity : AppCompatActivity() {
+class MainActivity : AppCompatActivity(),ShopItemFragment.OnEditingFinishedListener {
 
     private lateinit var mainViewModel: MainViewModel
     private lateinit var shopListAdapter: ShopListAdapter
     private lateinit var addButton: FloatingActionButton
+    private var shopItemContainer: FragmentContainerView? = null
 
 
+    @SuppressLint("CommitTransaction")
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_main)
+        shopItemContainer = findViewById(R.id.fragment_container)
+
         mainViewModel = ViewModelProvider(this)[MainViewModel::class.java]
         setupRecyclerView()
         mainViewModel.shopList.observe(this) {
@@ -32,8 +40,15 @@ class MainActivity : AppCompatActivity() {
         }
         addButton = findViewById(R.id.fab_main)
         addButton.setOnClickListener {
-            val intent = newIntentAddItem(this)
-            startActivity(intent)
+            if (isOnePaneMode()){
+                val intent = newIntentAddItem(this)
+                startActivity(intent)
+            }else{
+
+                launchFragment(ShopItemFragment.newInstanceAddItem())
+            }
+
+
         }
 
     }
@@ -74,9 +89,26 @@ class MainActivity : AppCompatActivity() {
 
     private fun setupClickListener() {
         shopListAdapter.onShopItemClickListener = {
-            val intent = newIntentEditItem(this, it.id)
-            startActivity(intent)
+            if (isOnePaneMode()) {
+                val intent = newIntentEditItem(this, it.id)
+                startActivity(intent)
+            } else {
+                launchFragment(ShopItemFragment.newInstanceEditItem(it.id))
+            }
+
         }
+    }
+
+    private fun isOnePaneMode(): Boolean {
+        return shopItemContainer == null
+    }
+
+    private fun launchFragment(fragment: Fragment) {
+        supportFragmentManager.popBackStack()
+        supportFragmentManager.beginTransaction()
+            .replace(R.id.fragment_container, fragment)
+            .addToBackStack(null)
+            .commit()
     }
 
     private fun setUpLongClickListener() {
@@ -89,5 +121,10 @@ class MainActivity : AppCompatActivity() {
         const val SOMETHING = "LOG ViewModel"
 
     }
+
+    override fun onEditingFinished() {
+        supportFragmentManager.popBackStack()
+    }
+
 
 }
