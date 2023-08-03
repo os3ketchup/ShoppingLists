@@ -4,13 +4,18 @@ import android.annotation.SuppressLint
 import android.content.Context
 import android.view.LayoutInflater
 import android.view.View
+import android.view.ViewAnimationUtils
 import android.view.ViewGroup
 import android.widget.TextView
 import android.widget.Toast
+import androidx.databinding.DataBindingUtil
+import androidx.databinding.ViewDataBinding
 import androidx.recyclerview.widget.DiffUtil
 import androidx.recyclerview.widget.ListAdapter
 import androidx.recyclerview.widget.RecyclerView
 import uz.os3ketchup.shoppinglists.R
+import uz.os3ketchup.shoppinglists.databinding.ItemShopDisabledBinding
+import uz.os3ketchup.shoppinglists.databinding.ItemShopEnabledBinding
 import uz.os3ketchup.shoppinglists.domain.ShopItem
 import java.lang.RuntimeException
 
@@ -22,30 +27,41 @@ class ShopListAdapter() : ListAdapter<ShopItem, ShopItemViewHolder>(ShopItemDiff
 
 
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): ShopItemViewHolder {
-        val view = when (viewType) {
-            SHOP_ITEM_ENABLED -> LayoutInflater.from(parent.context)
-                .inflate(R.layout.item_shop_enabled, parent, false)
-
-            SHOP_ITEM_DISABLED -> LayoutInflater.from(parent.context)
-                .inflate(R.layout.item_shop_disabled, parent, false)
-
+        val layout = when (viewType) {
+            SHOP_ITEM_ENABLED -> R.layout.item_shop_enabled
+            SHOP_ITEM_DISABLED -> R.layout.item_shop_disabled
             else -> throw RuntimeException("unknown view type:$viewType")
         }
-        return ShopItemViewHolder(view)
+        val binding = DataBindingUtil.inflate<ViewDataBinding>(
+            LayoutInflater.from(parent.context),
+            layout,
+            parent,
+            false)
+        return ShopItemViewHolder(binding)
     }
 
 
     override fun onBindViewHolder(holder: ShopItemViewHolder, position: Int) {
         val shopItem = getItem(position)
-        holder.tvName.text = shopItem.name
-        holder.tvCount.text = shopItem.count.toString()
+        val binding = holder.binding
 
-        holder.view.setOnLongClickListener {
+        when(binding){
+            is ItemShopEnabledBinding->{
+                binding.shopItem = shopItem
+            }
+            is ItemShopDisabledBinding->{
+                binding.shopItem = shopItem
+            }
+        }
+
+
+
+        binding.root.setOnLongClickListener {
             onShopItemLongClickListener?.invoke(shopItem)
             true
         }
 
-        holder.view.setOnClickListener {
+        binding.root.setOnClickListener {
             onShopItemClickListener?.invoke(shopItem)
         }
 
