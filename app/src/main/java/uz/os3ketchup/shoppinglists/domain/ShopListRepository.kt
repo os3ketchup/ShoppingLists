@@ -3,9 +3,9 @@ package uz.os3ketchup.shoppinglists.domain
 import androidx.lifecycle.LiveData
 
 interface ShopListRepository {
-    fun addShopItem(shopItem: ShopItem)
-    fun editShopItem(shopItem: ShopItem)
-    fun getShopItem(id:Int):ShopItem
-    fun getShopList():LiveData<List<ShopItem>>
-    fun removeShopItem(shopItem: ShopItem)
+    suspend fun addShopItem(shopItem: ShopItem)
+    suspend fun editShopItem(shopItem: ShopItem)
+    suspend fun getShopItem(id: Int): ShopItem
+    fun getShopList(): LiveData<List<ShopItem>>
+    suspend fun removeShopItem(shopItem: ShopItem)
 }

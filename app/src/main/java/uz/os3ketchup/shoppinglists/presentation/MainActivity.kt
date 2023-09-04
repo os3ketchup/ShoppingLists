@@ -48,8 +48,6 @@ class MainActivity : AppCompatActivity(),ShopItemFragment.OnEditingFinishedListe
 
                 launchFragment(ShopItemFragment.newInstanceAddItem())
             }
-
-
         }
 
     }
