@@ -1,18 +1,20 @@
 package uz.os3ketchup.shoppinglists.data
 
-import android.app.Application
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.MediatorLiveData
-import androidx.lifecycle.map
 import uz.os3ketchup.shoppinglists.domain.ShopItem
 import uz.os3ketchup.shoppinglists.domain.ShopListRepository
+import javax.inject.Inject
 
 
-class ShopListRepositoryImpl(application: Application) : ShopListRepository {
+class ShopListRepositoryImpl @Inject constructor(
+    private val mapper: ShopListMapper,
+    private val shopListDao: ShopListDao
+) : ShopListRepository {
 
 
-    private val shopListDao = AppDatabase.getInstance(application).shopListDao()
-    private val mapper = ShopListMapper()
+//    private val shopListDao = AppDatabase.getInstance(application).shopListDao()
+
 
 
     override suspend fun addShopItem(shopItem: ShopItem) {

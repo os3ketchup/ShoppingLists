@@ -1,8 +1,9 @@
 package uz.os3ketchup.shoppinglists.data
 
 import uz.os3ketchup.shoppinglists.domain.ShopItem
+import javax.inject.Inject
 
-class ShopListMapper {
+class ShopListMapper @Inject constructor() {
     fun mapEntityToDbModel(shopItem: ShopItem): ShopItemDbModel {
         return ShopItemDbModel(
             id = shopItem.id,

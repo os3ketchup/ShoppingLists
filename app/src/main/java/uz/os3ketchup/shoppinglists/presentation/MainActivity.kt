@@ -1,6 +1,7 @@
 package uz.os3ketchup.shoppinglists.presentation
 
 import android.annotation.SuppressLint
+import android.app.Application
 import android.os.Bundle
 import android.util.Log
 import androidx.appcompat.app.AppCompatActivity
@@ -11,29 +12,40 @@ import androidx.recyclerview.widget.ItemTouchHelper
 import androidx.recyclerview.widget.RecyclerView
 import com.google.android.material.floatingactionbutton.FloatingActionButton
 import uz.os3ketchup.shoppinglists.R
+import uz.os3ketchup.shoppinglists.ShopListApp
 import uz.os3ketchup.shoppinglists.databinding.ActivityMainBinding
+import uz.os3ketchup.shoppinglists.di.ApplicationComponent
 import uz.os3ketchup.shoppinglists.presentation.ShopItemActivity.Companion.newIntentAddItem
 import uz.os3ketchup.shoppinglists.presentation.ShopItemActivity.Companion.newIntentEditItem
 import uz.os3ketchup.shoppinglists.presentation.ShopListAdapter.Companion.MAX_POOL
 import uz.os3ketchup.shoppinglists.presentation.ShopListAdapter.Companion.SHOP_ITEM_DISABLED
 import uz.os3ketchup.shoppinglists.presentation.ShopListAdapter.Companion.SHOP_ITEM_ENABLED
 import java.lang.RuntimeException
+import javax.inject.Inject
 
-class MainActivity : AppCompatActivity(),ShopItemFragment.OnEditingFinishedListener {
+class MainActivity : AppCompatActivity(), ShopItemFragment.OnEditingFinishedListener {
 
     private lateinit var mainViewModel: MainViewModel
     private lateinit var shopListAdapter: ShopListAdapter
-    lateinit var binding:ActivityMainBinding
+    lateinit var binding: ActivityMainBinding
+
+    @Inject
+    lateinit var viewModelFactory: ViewModelFactory
+
+    private val component by lazy {
+        (application as ShopListApp).component
+    }
 
 
     @SuppressLint("CommitTransaction")
     override fun onCreate(savedInstanceState: Bundle?) {
+        component.inject(this)
         super.onCreate(savedInstanceState)
         binding = ActivityMainBinding.inflate(layoutInflater)
         setContentView(binding.root)
 
 
-        mainViewModel = ViewModelProvider(this)[MainViewModel::class.java]
+        mainViewModel = ViewModelProvider(this,viewModelFactory)[MainViewModel::class.java]
         setupRecyclerView()
         mainViewModel.shopList.observe(this) {
             Log.d(SOMETHING, "onCreate:s $it")
@@ -41,10 +53,10 @@ class MainActivity : AppCompatActivity(),ShopItemFragment.OnEditingFinishedListe
         }
 
         binding.fabMain.setOnClickListener {
-            if (isOnePaneMode()){
+            if (isOnePaneMode()) {
                 val intent = newIntentAddItem(this)
                 startActivity(intent)
-            }else{
+            } else {
 
                 launchFragment(ShopItemFragment.newInstanceAddItem())
             }

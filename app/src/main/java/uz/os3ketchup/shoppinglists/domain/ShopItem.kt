@@ -1,6 +1,6 @@
 package uz.os3ketchup.shoppinglists.domain
 
-data class ShopItem(
+data class ShopItem   (
     var name:String,
     var count:Int,
     val enabled:Boolean,

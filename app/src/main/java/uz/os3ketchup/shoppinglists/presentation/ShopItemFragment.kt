@@ -9,6 +9,7 @@ import android.view.View
 import android.view.ViewGroup
 import androidx.fragment.app.Fragment
 import androidx.lifecycle.ViewModelProvider
+import uz.os3ketchup.shoppinglists.ShopListApp
 import uz.os3ketchup.shoppinglists.databinding.FragmentShopItemBinding
 import uz.os3ketchup.shoppinglists.domain.ShopItem.Companion.UNDEFINED_ID
 
@@ -20,6 +21,11 @@ class ShopItemFragment : Fragment() {
     private val binding:FragmentShopItemBinding
     get() = _binding ?: throw RuntimeException("FragmentShopItemBinding==NULL")
 
+    lateinit var viewModelFactory: ViewModelFactory
+    private val component by lazy {
+        (requireActivity().application as ShopListApp).component
+    }
+
 
     private var shopItemMode: String = UNKNOWN_MODE
     private var shopItemId: Int = UNDEFINED_ID
@@ -27,6 +33,7 @@ class ShopItemFragment : Fragment() {
 
     private var onEditingFinishedListener: OnEditingFinishedListener? = null
     override fun onAttach(context: Context) {
+        component.inject(this)
         super.onAttach(context)
         if (context is OnEditingFinishedListener) {
             onEditingFinishedListener = context
@@ -53,7 +60,7 @@ class ShopItemFragment : Fragment() {
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
-        shopItemViewModel = ViewModelProvider(this)[ShopItemViewModel::class.java]
+        shopItemViewModel = ViewModelProvider(this,viewModelFactory)[ShopItemViewModel::class.java]
         binding.viewModel = shopItemViewModel
         binding.lifecycleOwner = viewLifecycleOwner
         addTextChangedListeners()

@@ -15,14 +15,13 @@ import uz.os3ketchup.shoppinglists.domain.AddShopItemUseCase
 import uz.os3ketchup.shoppinglists.domain.EditShopItemUseCase
 import uz.os3ketchup.shoppinglists.domain.GetShopItemUseCase
 import uz.os3ketchup.shoppinglists.domain.ShopItem
+import javax.inject.Inject
 
-class ShopItemViewModel(application: Application) : AndroidViewModel(application) {
-
-    private val repository = ShopListRepositoryImpl(application)
-
-    private val getShopItemUseCase = GetShopItemUseCase(repository)
-    private val addShopItemUseCase = AddShopItemUseCase(repository)
-    private val editShopItemUseCase = EditShopItemUseCase(repository)
+class ShopItemViewModel @Inject constructor(
+    private val getShopItemUseCase: GetShopItemUseCase,
+    private val addShopItemUseCase: AddShopItemUseCase,
+    private val editShopItemUseCase: EditShopItemUseCase
+) : ViewModel() {
 
 
     private val _errorInputName = MutableLiveData<Boolean>()
